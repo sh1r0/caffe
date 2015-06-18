@@ -374,6 +374,11 @@ ifeq ($(BLAS), mkl)
 	MKLROOT ?= /opt/intel/mkl
 	BLAS_INCLUDE ?= $(MKLROOT)/include
 	BLAS_LIB ?= $(MKLROOT)/lib $(MKLROOT)/lib/intel64
+else ifeq ($(BLAS), eigen)
+	# Eigen
+	COMMON_FLAGS += -DUSE_EIGEN
+	EIGEN_DIR ?= /opt/eigen
+	BLAS_INCLUDE ?= $(EIGEN_DIR)
 else ifeq ($(BLAS), open)
 	# OpenBLAS
 	LIBRARIES += openblas
