@@ -53,6 +53,11 @@ caffe_option(USE_LMDB "Build with lmdb" ON)
 caffe_option(ALLOW_LMDB_NOLOCK "Allow MDB_NOLOCK when reading LMDB files (only if necessary)" OFF)
 caffe_option(USE_HDF5 "Build with hdf5" ON)
 
+if(ANDROID)
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".a;.so")
+  caffe_enable_cpp11_support()
+endif()
+
 # ---[ Dependencies
 include(cmake/Dependencies.cmake)
 
@@ -66,10 +71,6 @@ caffe_set_caffe_link()
 if(USE_libstdcpp)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
   message("-- Warning: forcing libstdc++ (controlled by USE_libstdcpp option in cmake)")
-endif()
-
-if(ANDROID)
-  caffe_enable_cpp11_support()
 endif()
 
 add_definitions(-DGTEST_USE_OWN_TR1_TUPLE)
