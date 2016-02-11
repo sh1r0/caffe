@@ -35,8 +35,9 @@ string jstring2string(JNIEnv *env, jstring jstr) {
 }
 
 JNIEXPORT void JNICALL
-Java_com_sh1r0_caffe_1android_1lib_CaffeMobile_setNumThreads(
-    JNIEnv *env, jobject thiz, jint numThreads) {
+Java_com_sh1r0_caffe_1android_1lib_CaffeMobile_setNumThreads(JNIEnv *env,
+                                                             jobject thiz,
+                                                             jint numThreads) {
   int num_threads = numThreads;
 #ifdef USE_EIGEN
   omp_set_num_threads(num_threads);
@@ -45,10 +46,8 @@ Java_com_sh1r0_caffe_1android_1lib_CaffeMobile_setNumThreads(
 #endif
 }
 
-JNIEXPORT void JNICALL
-Java_com_sh1r0_caffe_1android_1lib_CaffeMobile_enableLog(JNIEnv *env,
-                                                         jobject thiz,
-                                                         jboolean enabled) {}
+JNIEXPORT void JNICALL Java_com_sh1r0_caffe_1android_1lib_CaffeMobile_enableLog(
+    JNIEnv *env, jobject thiz, jboolean enabled) {}
 
 JNIEXPORT jint JNICALL Java_com_sh1r0_caffe_1android_1lib_CaffeMobile_loadModel(
     JNIEnv *env, jobject thiz, jstring modelPath, jstring weightsPath) {
@@ -74,12 +73,27 @@ Java_com_sh1r0_caffe_1android_1lib_CaffeMobile_setMeanWithMeanValues(
   caffe_mobile->SetMean(mean_values);
 }
 
-JNIEXPORT void JNICALL
-Java_com_sh1r0_caffe_1android_1lib_CaffeMobile_setScale(JNIEnv *env,
-                                                        jobject thiz,
-                                                        jfloat scale) {
+JNIEXPORT void JNICALL Java_com_sh1r0_caffe_1android_1lib_CaffeMobile_setScale(
+    JNIEnv *env, jobject thiz, jfloat scale) {
   CaffeMobile *caffe_mobile = CaffeMobile::Get();
   caffe_mobile->SetScale(scale);
+}
+
+JNIEXPORT jfloatArray JNICALL
+Java_com_sh1r0_caffe_1android_1lib_CaffeMobile_getConfidenceScore(
+    JNIEnv *env, jobject thiz, jstring imgPath) {
+  CaffeMobile *caffe_mobile = CaffeMobile::Get();
+  vector<float> conf_score =
+      caffe_mobile->GetConfidenceScore(jstring2string(env, imgPath));
+
+  jfloatArray result;
+  result = env->NewFloatArray(conf_score.size());
+  if (result == NULL) {
+    return NULL; /* out of memory error thrown */
+  }
+  // move from the temp structure to the java structure
+  env->SetFloatArrayRegion(result, 0, conf_score.size(), &conf_score[0]);
+  return result;
 }
 
 JNIEXPORT jintArray JNICALL

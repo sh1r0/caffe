@@ -24,6 +24,8 @@ public:
 
   void SetScale(const float scale);
 
+  vector<float> GetConfidenceScore(const string &img_path);
+
   vector<int> PredictTopK(const string &img_path, int k);
 
   vector<vector<float>> ExtractFeatures(const string &img_path,

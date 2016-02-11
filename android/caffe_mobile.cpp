@@ -218,6 +218,10 @@ vector<float> CaffeMobile::Forward(const string &filename) {
   return vector<float>(begin, end);
 }
 
+vector<float> CaffeMobile::GetConfidenceScore(const string &img_path) {
+  return Forward(img_path);
+}
+
 vector<int> CaffeMobile::PredictTopK(const string &img_path, int k) {
   const vector<float> probs = Forward(img_path);
   k = std::min<int>(std::max(k, 1), probs.size());
