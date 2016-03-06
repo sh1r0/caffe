@@ -206,7 +206,7 @@ vector<float> CaffeMobile::Forward(const string &filename) {
   Preprocess(img, &input_channels);
 
   clock_t t_start = clock();
-  net_->ForwardPrefilled();
+  net_->Forward();
   clock_t t_end = clock();
   VLOG(1) << "Forwarding time: " << 1000.0 * (t_end - t_start) / CLOCKS_PER_SEC
           << " ms.";
