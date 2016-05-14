@@ -64,8 +64,8 @@ CaffeMobile::CaffeMobile(const string &model_path, const string &weights_path) {
   net_.reset(new Net<float>(model_path, caffe::TEST));
   net_->CopyTrainedLayersFrom(weights_path);
   clock_t t_end = clock();
-  VLOG(1) << "Loading time: " << 1000.0 * (t_end - t_start) / CLOCKS_PER_SEC
-          << " ms.";
+  LOG(INFO) << "Loading time: " << 1000.0 * (t_end - t_start) / CLOCKS_PER_SEC
+            << " ms.";
 
   CHECK_EQ(net_->num_inputs(), 1) << "Network should have exactly one input.";
   CHECK_EQ(net_->num_outputs(), 1) << "Network should have exactly one output.";
@@ -208,8 +208,8 @@ vector<float> CaffeMobile::Forward(const string &filename) {
   clock_t t_start = clock();
   net_->Forward();
   clock_t t_end = clock();
-  VLOG(1) << "Forwarding time: " << 1000.0 * (t_end - t_start) / CLOCKS_PER_SEC
-          << " ms.";
+  LOG(INFO) << "Forwarding time: " << 1000.0 * (t_end - t_start) / CLOCKS_PER_SEC
+            << " ms.";
 
   /* Copy the output layer to a std::vector */
   Blob<float> *output_layer = net_->output_blobs()[0];
