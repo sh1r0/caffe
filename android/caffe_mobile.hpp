@@ -26,6 +26,8 @@ public:
 
   vector<float> GetConfidenceScore(const string &img_path);
 
+  vector<float> GetConfidenceScore(cv::Mat &img);
+
   vector<int> PredictTopK(const string &img_path, int k);
 
   vector<vector<float>> ExtractFeatures(const string &img_path,
@@ -43,6 +45,8 @@ private:
   void WrapInputLayer(std::vector<cv::Mat> *input_channels);
 
   vector<float> Forward(const string &filename);
+
+  vector<float> Forward(cv::Mat &img);
 
   shared_ptr<Net<float>> net_;
   cv::Size input_geometry_;

@@ -252,6 +252,39 @@ CaffeMobile::ExtractFeatures(const string &img_path,
   return features;
 }
 
+// Overloads to allow us to pass image as Mat instead of file path.
+vector<float> CaffeMobile::GetConfidenceScore(cv::Mat &img) {
+  return Forward(img);
+}
+
+
+vector<float> CaffeMobile::Forward(cv::Mat &img) {
+
+  
+  Blob<float> *input_layer = net_->input_blobs()[0];
+  input_layer->Reshape(1, num_channels_, input_geometry_.height,
+                       input_geometry_.width);
+  /* Forward dimension change to all layers. */
+  net_->Reshape();
+
+  vector<cv::Mat> input_channels;
+  WrapInputLayer(&input_channels);
+
+  Preprocess(img, &input_channels);
+
+  clock_t t_start = clock();
+  net_->Forward();
+  clock_t t_end = clock();
+  LOG(INFO) << "Forwarding time: " << 1000.0 * (t_end - t_start) / CLOCKS_PER_SEC
+            << " ms.";
+
+  /* Copy the output layer to a std::vector */
+  Blob<float> *output_layer = net_->output_blobs()[0];
+  const float *begin = output_layer->cpu_data();
+  const float *end = begin + output_layer->channels();
+  return vector<float>(begin, end);
+}
+
 } // namespace caffe
 
 using caffe::CaffeMobile;
