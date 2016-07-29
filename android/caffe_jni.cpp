@@ -12,6 +12,12 @@
 
 #include "caffe/caffe.hpp"
 #include "caffe_mobile.hpp"
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv/cv.h>
+#include <opencv/highgui.h>
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -149,6 +155,49 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   FLAGS_android_logcat_tag = "caffe_jni";
 
   return JNI_VERSION_1_6;
+}
+
+void getBGRFromYUV(void* data, const int width, const int height, cv::Mat& bgr)
+
+{
+
+    cv::Mat yuv(height+height/2, width, CV_8UC1, data);
+
+    bgr = cv::Mat(height, width, CV_8UC4);
+
+    cv::cvtColor(yuv, bgr, CV_YUV420sp2BGR );
+}
+
+
+JNIEXPORT jfloatArray JNICALL
+Java_com_sh1r0_caffe_1android_1lib_CaffeMobile_getConfidenceScore(
+    JNIEnv *env, jobject thiz, jbyteArray image, jint width, jint height, jint roiX, jint roiY, jint roiWidth, jint roiHeight) {
+  CaffeMobile *caffe_mobile = CaffeMobile::Get();
+  jbyte* image_ptr = env->GetByteArrayElements(image, 0);
+  cv::Mat previewBGR;
+  getBGRFromYUV(reinterpret_cast<void*>(image_ptr), width, height, previewBGR);
+      
+  cv::Rect roi((int) roiX, (int) roiY, (int) roiWidth, (int) roiHeight);
+  
+    // Need to rotate 270 degrees -> do a rotate and flip.
+  cv::Mat croppedImage = previewBGR(roi);
+    cv::Mat croppedRotated90;
+    cv::transpose(croppedImage, croppedRotated90);
+    cv::flip(croppedRotated90, croppedRotated90, -1);
+
+  CaffeMobile *caffe_mobile = CaffeMobile::Get();
+      
+vector<float> conf_score =
+      caffe_mobile->GetConfidenceScore(croppedRotated90);
+
+  jfloatArray result;
+  result = env->NewFloatArray(conf_score.size());
+  if (result == NULL) {
+    return NULL; /* out of memory error thrown */
+  }
+
+  env->SetFloatArrayRegion(result, 0, conf_score.size(), &conf_score[0]);
+  return result;
 }
 
 #ifdef __cplusplus
