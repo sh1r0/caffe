@@ -172,7 +172,7 @@ void getBGRFromYUV(void* data, const int width, const int height, cv::Mat& bgr)
 JNIEXPORT jfloatArray JNICALL
 Java_com_sh1r0_caffe_1android_1lib_CaffeMobile_getConfidenceScore(
     JNIEnv *env, jobject thiz, jbyteArray image, jint width, jint height, jint roiX, jint roiY, jint roiWidth, jint roiHeight) {
-  CaffeMobile *caffe_mobile = CaffeMobile::Get();
+
   jbyte* image_ptr = env->GetByteArrayElements(image, 0);
   cv::Mat previewBGR;
   getBGRFromYUV(reinterpret_cast<void*>(image_ptr), width, height, previewBGR);
